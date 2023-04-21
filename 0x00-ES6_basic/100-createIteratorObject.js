@@ -4,12 +4,13 @@ export default function createIteratorObject(report) {
     thearray.push(...item);
   }
 
-  const index = 0;
+  let index = 0;
 
   return {
     next() {
       if (index < thearray.length) {
         return { value: thearray[index], done: false };
+        index += 1;
       }
       return { done: true };
     },
