@@ -1,18 +1,22 @@
 export default function createIteratorObject(report) {
-  const thearray = [];
-  for (const item of Object.values(report.allEmployees)) {
-    thearray.push(...item);
+  const employeesArray = [];
+
+  for (const employeeGroup of Object.values(report.allEmployees)) {
+    employeesArray.push(...employeeGroup);
   }
 
-  let index = 0;
-
   return {
-    next() {
-      if (index < thearray.length) {
-        return { value: thearray[index], done: false };
-        index += 1;
-      }
-      return { done: true };
+    [Symbol.iterator]() {
+      let index = 0;
+      return {
+        next() {
+          if (index < employeesArray.length) {
+            // eslint-disable-next-line no-plusplus
+            return { value: employeesArray[index++], done: false };
+          }
+          return { done: true };
+        },
+      };
     },
   };
 }
