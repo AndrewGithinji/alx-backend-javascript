@@ -1,11 +1,10 @@
-export default function cleanSet(mySet, startString) {
-  let result = ' ';
-  for (const el of mySet) {
-    if (el.startsWith(startString)) {
-      result += `${el.slice(startString.length)}-`;
-    }
+/* eslint-disable array-callback-return */
+export default function cleanSet(set, string) {
+  if (string === undefined || string.length === 0) {
+    return '';
   }
-  result = result.slice(0, -1);
-  // eslint-disable-next-line consistent-return
-  return result;
+  return [...set]
+    .filter((str) => (str !== undefined ? str.startsWith(string) : ''))
+    .map((str) => (str !== undefined ? str.slice(string.length) : ''))
+    .join('-');
 }
