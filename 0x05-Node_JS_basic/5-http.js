@@ -1,13 +1,13 @@
-import { createServer } from 'http';
+const http = require('http');
 
-import countStudents from './3-read_file_async';
+const countStudents = require('./3-read_file_async');
 
 const args = process.argv.slice(2);
 
 const hostname = '127.0.0.1';
 const port = 1245;
 
-const app = createServer(async (req, res) => {
+const app = http.createServer(async (req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
 
@@ -31,4 +31,4 @@ app.listen(port, hostname, () => {
   // console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-export default app;
+module.exports = app;
