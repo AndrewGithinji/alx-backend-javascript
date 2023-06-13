@@ -1,32 +1,52 @@
 const fs = require('fs');
 
-function readDatabase(path) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf8', (err, data) => {
+module.exports = function readDatabase(path) {
+  return new Promise(((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, paramsStudents) => {
       if (err) {
-        reject(Error(err));
+        reject(Error('Cannot load the database'));
         return;
       }
-      const content = data.toString().split('\n');
 
-      let students = content.filter((item) => item);
+      let students = paramsStudents;
+      students = students.split('\n');
+      const headers = students.shift().split(',');
 
-      students = students.map((item) => item.split(','));
+      const groupingStudentsField = {};
+      const studentsObjects = [];
 
-      const fields = {};
-      for (const i in students) {
-        if (i !== 0) {
-          if (!fields[students[i][3]]) fields[students[i][3]] = [];
+      students.forEach((student) => {
+        if (student) {
+          const studentInfo = student.split(',');
+          const studentObject = {};
 
-          fields[students[i][3]].push(students[i][0]);
+          headers.forEach((header, index) => {
+            studentObject[header] = studentInfo[index];
+            if (header === 'field') {
+              if (groupingStudentsField[studentInfo[index]]) {
+                groupingStudentsField[studentInfo[index]].push(studentObject.firstname);
+              } else {
+                groupingStudentsField[studentInfo[index]] = [studentObject.firstname];
+              }
+            }
+          });
+          studentsObjects.push(studentObject);
+        }
+      });
+      const numberStudents = `Number of students: ${studentsObjects.length}`;
+
+      let response = `${numberStudents}\n`;
+      console.log(numberStudents);
+
+      for (const groupStudent in groupingStudentsField) {
+        if (groupingStudentsField[groupStudent]) {
+          const listStudents = groupingStudentsField[groupStudent];
+          const responseGroupStudents = `Number of students in ${groupStudent}: ${listStudents.length}. List: ${listStudents.join(', ')}`;
+          response += `${responseGroupStudents}\n`;
+          console.log(responseGroupStudents);
         }
       }
-
-      delete fields.field;
-
-      resolve(fields);
+      resolve(response);
     });
-  });
-}
-
-export default readDatabase;
+  }));
+};
