@@ -1,43 +1,40 @@
-import readDatabase from '../utils';
+const readDatabase = require('../utils');
 
-class StudentsController {
-  static getAllStudents(request, response, DATABASE) {
-    readDatabase(DATABASE)
-      .then((fields) => {
-        const students = [];
-
-        let msg;
-
-        students.push('This is the list of our students');
-
-        for (const key of Object.keys(fields)) {
-          msg = `Number of students in ${key}: ${fields[key].length
-          }. List: ${fields[key].join(', ')}`;
-
-          students.push(msg);
-        }
-        response.send(200, `${students.join('\n')}`);
+export default class StudentsController {
+  static getAllStudents(request, response, DB) {
+    readDatabase(DB)
+      .then((data) => {
+        const msg = 'This is the list of our students\n';
+        const newData = msg + data;
+        response.send(200, newData.slice(0, -1));
       })
-      .catch(() => {
-        response.send(500, 'Cannot load the database');
+      .catch((error) => {
+        response.send(500, error.message);
       });
   }
 
-  static getAllStudentsByMajor(request, response, DATABASE) {
+  static getAllStudentsByMajor(request, response, DB) {
     const { major } = request.params;
 
     if (major !== 'CS' && major !== 'SWE') {
       response.send(500, 'Major parameter must be CS or SWE');
     } else {
-      readDatabase(DATABASE)
+      readDatabase(DB)
         .then((fields) => {
-          const students = fields[major];
+          const list = fields.split('\n');
+          const [field1, field2] = list.slice(1, 3);
 
-          response.send(200, `List: ${students.join(', ')}`);
+          let students;
+          if (major === 'CS') {
+            students = field1;
+          } else {
+            students = field2;
+          }
+          students = students.split('. ');
+
+          response.send(200, `${students[1]}`);
         })
         .catch(() => response.send(500, 'Cannot load the database'));
     }
   }
 }
-
-export default StudentsController;
